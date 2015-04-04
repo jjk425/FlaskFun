@@ -12,7 +12,7 @@ def home():
 	if not session.get("logged_in"):
 		return render_template('login.html')
 	else:
-		return '''<p>Who did it?<form method='get' action='/logout'><button type="submit">Log out</button></form> </p>'''
+		return render_template('home.html')#'''<p>Who did it?<form method='get' action='/logout'><button type="submit">Log out</button></form> </p>'''
 
 @app.route('/login', methods=['POST'])
 def do_admin_login():
@@ -27,6 +27,7 @@ def do_admin_login():
 
 	if result:
 		session['logged_in'] = True
+		session['username'] = POST_USERNAME
 	else:
 		flash('Wrong password!')
 	return home()
@@ -35,6 +36,17 @@ def do_admin_login():
 def logout():
 	session['logged_in'] = False
 	return home()
+
+@app.route('/didit')
+def didit():
+	if not session.get("logged_in"):
+		return "How are you seeing this?!"
+	user = session['username']
+	notes = str(request.form['notes'])
+	event = Event(user, notes)
+	s.add(event)
+	return home()
+
 
 if __name__ == "__main__":
 	app.secret_key = os.urandom(12)
